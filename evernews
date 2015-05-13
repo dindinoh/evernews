@@ -1,0 +1,56 @@
+#!/bin/bash
+
+MYNOTEBOOK="1TOREAD"
+
+function SHOWLIST(){
+
+    geeknote find --notebooks $MYNOTEBOOK
+    echo -e "\nWhat would you like to read?"
+    read n
+    if [ $n == "q" ]; then exit 0; fi
+    READENTRY $n
+
+}
+
+function TAGENTRY(){
+    
+    echo "Enter tag or tag, tag [...] and press enter:"
+    read t
+    geeknote edit --note $n --tags "$t"
+
+}
+
+function MOVEENTRY(){
+    
+    echo "Enter notebook and press enter:"
+    read b
+    geeknote edit --note $n --notebook "$b"
+
+}
+
+function ASKAFTER(){
+
+    echo "(d)elete (t)ag (m)ove (n)ext (l)ist (a)gain (q)uit?"
+    read a
+    
+    case $a in
+	d) geeknote remove $n ; SHOWLIST ;;
+	t) TAGENTRY ; SHOWLIST ;;
+	m) MOVEENTRY ; SHOWLIST ;;
+	n) READENTRY $(( $n + 1)) ; ASKAFTER ;;
+	l) START ;;
+	a) READENTRY $n ;;
+	q) exit 0 ;;
+	*) ASKAFTER ;;
+    esac
+
+}
+
+function READENTRY(){
+
+    geeknote show $1 | less
+    ASKAFTER
+
+}
+
+SHOWLIST
